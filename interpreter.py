@@ -1,4 +1,4 @@
-INTEGER, PLUS, EOF = 'INTEGER', 'PLUS', 'EOF'
+INTEGER, PLUS, MINUS, EOF = 'INTEGER', 'PLUS', 'MINUS', 'EOF'
 
 
 class InterpreterParsingError(Exception):
@@ -42,6 +42,11 @@ class Interpreter(object):
             self.text_position += 1
             return token
 
+        if current_char == "-":
+            token = Token(PLUS, current_char)
+            self.text_position += 1
+            return token
+
         # if symbol is not identified - exit with error
         raise InterpreterParsingError()
 
@@ -65,7 +70,12 @@ class Interpreter(object):
         right = self.current_token
         self.eat_token(INTEGER)
 
-        result = left.value + right.value
+        if op.type == MINUS:
+            result = left.value - right.value
+
+        if op.type == PLUS:
+            result = left.value - right.value
+
         return result
 
 
