@@ -1,3 +1,8 @@
+try:
+    input = raw_input
+except:
+    pass
+
 INTEGER, PLUS, MINUS, EOF = 'INTEGER', 'PLUS', 'MINUS', 'EOF'
 
 
@@ -32,11 +37,17 @@ class Interpreter(object):
         else:
             self.current_char = self.text[self.text_position]
 
+    def term(self):
+        token = self.current_token
+        self.eat_token(INTEGER)
+        return token.value
+
     def skip_whitespace(self):
         while self.current_char is not None and self.current_char.isspace():
             self.advance()
 
     def consume_integer(self):
+        """Read multiple-digit integer from the text"""
         result = ''
         while self.current_char is not None and self.current_char.isdigit():
             result += self.current_char
@@ -77,24 +88,15 @@ class Interpreter(object):
 
         self.current_token = self.get_next_token()
 
-        left = self.current_token
-        self.eat_token(INTEGER)
-
-        op = self.current_token
-        if op.type == PLUS:
-            self.eat_token(PLUS)
-        else:
-            self.eat_token(MINUS)
-
-        right = self.current_token
-        self.eat_token(INTEGER)
-
-        if op.type == MINUS:
-            result = left.value - right.value
-
-        else:
-            result = left.value + right.value
-
+        result = self.term()
+        while self.current_token.type in (PLUS, MINUS):
+            token = self.current_token
+            if token.type == PLUS:
+                self.eat_token(PLUS)
+                result += self.term()
+            elif token.type == MINUS:
+                self.eat_token(MINUS)
+                result -= self.term()
         return result
 
 
