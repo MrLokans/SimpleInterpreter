@@ -14,7 +14,7 @@ class InterpreterParsingError(Exception):
 class Interpreter(object):
     def __init__(self, lexer):
         self.lexer = lexer
-        self.current_token = self.lexer.get_next_token()
+        self.current_token = None
 
     def error(self):
         raise InterpreterParsingError("Invalid syntax")
@@ -48,9 +48,17 @@ class Interpreter(object):
         return result
 
     def expr(self):
+        """Main interpreter method
+
+        > 14 + 2 * 3 - 6 /2
+        17
+
+        expr : term (( PLUS | MINUS ) term)*
+        term: factor (( MUL | DIV  ))
+        factor : INTEGER
+        """
 
         self.current_token = self.lexer.get_next_token()
-
         result = self.term()
         while self.current_token.type in (tokens.PLUS, tokens.MINUS):
             token = self.current_token
