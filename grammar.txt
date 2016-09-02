@@ -1,3 +1,3 @@
 expr : term (( PLUS | MINUS ) term)*
 term: factor (( MUL | DIV  ))
-factor : INTEGER
+factor : INTEGER | LPAREN expr RPAREN

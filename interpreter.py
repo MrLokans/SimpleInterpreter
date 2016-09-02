@@ -14,7 +14,7 @@ class InterpreterParsingError(Exception):
 class Interpreter(object):
     def __init__(self, lexer):
         self.lexer = lexer
-        self.current_token = None
+        self.current_token = self.lexer.get_next_token()
 
     def error(self):
         raise InterpreterParsingError("Invalid syntax")
@@ -27,10 +27,16 @@ class Interpreter(object):
             self.error()
 
     def factor(self):
-        """factor : INTEGER"""
+        """factor : INTEGER | LPAREN expr RPAREN"""
         token = self.current_token
-        self.eat_token(tokens.INTEGER)
-        return token.value
+        if token.type == tokens.INTEGER:
+            self.eat_token(tokens.INTEGER)
+            return token.value
+        elif token.type == tokens.LPAREN:
+            self.eat_token(tokens.LPAREN)
+            result = self.expr()
+            self.eat_token(tokens.RPAREN)
+            return result
 
     def term(self):
         """term : factor ((MUL | DIV) factor)*"""
@@ -58,7 +64,6 @@ class Interpreter(object):
         factor : INTEGER
         """
 
-        self.current_token = self.lexer.get_next_token()
         result = self.term()
         while self.current_token.type in (tokens.PLUS, tokens.MINUS):
             token = self.current_token
