@@ -6,9 +6,11 @@ class LexerError(Exception):
 
 
 class Lexer(object):
-    def __init__(self, text):
-        self.text = text
+    def __init__(self):
         self.pos = 0
+
+    def lex(self, text):
+        self.text = text
         self.current_char = self.text[self.pos]
 
     def error(self):

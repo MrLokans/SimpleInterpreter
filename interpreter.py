@@ -12,9 +12,8 @@ class InterpreterParsingError(Exception):
 
 
 class Interpreter(object):
-    def __init__(self, lexer):
-        self.lexer = lexer
-        self.current_token = self.lexer.get_next_token()
+    def __init__(self, lexer_cls):
+        self.lexer = lexer_cls()
 
     def error(self):
         raise InterpreterParsingError("Invalid syntax")
@@ -75,14 +74,19 @@ class Interpreter(object):
                 result -= self.term()
         return result
 
+    def eval_text(self, text):
+        self.lexer.lex(text)
+        self.current_token = self.lexer.get_next_token()
+
 
 def main():
     while True:
         text = input(">")
         if not text:
             continue
-        lexer = Lexer(text)
-        interpreter = Interpreter(lexer)
+        # lexer = Lexer(text)
+        interpreter = Interpreter(Lexer())
+        interpreter.eval_text(text)
         result = interpreter.expr()
         print(result)
 
